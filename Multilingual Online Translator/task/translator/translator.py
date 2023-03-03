@@ -43,14 +43,13 @@ def output_examples(soup, lang_translate):
 
 def get_langs():
     print("Hello, welcome to the translator. Translator supports:")
-    language_list = ['Arabic', 'German', 'English', 'Spanish', 'French', 'Hebrew', 'Japanese', 'Dutch', 'Polish',
-                     'Portuguese', 'Romanian', 'Russian', 'Turkish']
+    language_dict = {1: "Arabic", 2: "German", 3: "English", 4: "Spanish", 5: "French", 6: "Hebrew", 7: "Japanese", 8: "Dutch", 9: "Polish", 10: "Portuguese", 11: "Romanian", 12: "Russian", 13: "Turkish"}
 
-    for i, n in enumerate(language_list):
-        print(f"{i+1}. {n}")
+    for i in language_dict:
+        print(f"{i}. {language_dict[i]}")
 
-    lang_base = language_list[int(input("Type the number of your language:"))-1]
-    lang_translate = language_list[int(input("Type the number of language you want to translate to:"))-1]
+    lang_base = language_dict[int(input("Type the number of your language:"))]
+    lang_translate = language_dict[int(input("Type the number of language you want to translate to:"))]
     word = input("Type the word you want to translate:")
 
     return lang_base, lang_translate, word
