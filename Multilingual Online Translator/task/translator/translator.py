@@ -2,23 +2,32 @@ import argparse
 import requests
 from bs4 import BeautifulSoup
 
-
 def get_response(lang_base, lang_translate, word):
     headers = {'User-Agent': 'Mozilla/5.0'}
     base_url = "https://context.reverso.net/translation/"
     url = base_url + f"{lang_base.lower()}-{lang_translate.lower()}/{word}"
-    r = requests.get(url, headers=headers)
+    try:
+        r = requests.get(url, headers=headers)
+    except ConnectionError:
+        print('Something wrong with your internet connection')
+        exit()
+
     return r.content
 
 
-def translate(page_html, lang_translate, file):
+def translate(page_html, lang_translate, file, word):
     soup = BeautifulSoup(page_html, 'html.parser')
 
-    output_translations(soup, lang_translate, file)
+    output_translations(soup, lang_translate, file, word)
     output_examples(soup, lang_translate, file)
 
-def output_translations(soup, lang_translate, file):
+def output_translations(soup, lang_translate, file, word):
+
     translated_words = soup.find_all("span", {"class": "display-term"})
+
+    if not translated_words:
+        print(f"Sorry, unable to find {word}")
+        quit()
 
     print(f"{lang_translate} Translation:")
     file.write(f"{lang_translate} Translation:\n")
@@ -54,14 +63,15 @@ def get_langs(language_dict):
     lang_base = args.lang_base.capitalize()
     lang_translate = args.lang_translate.capitalize()
 
-    if lang_translate in language_dict.values():
-        pass
-    elif args.lang_translate == 'all':
-        lang_translate = 0
-    else:
-        print('language not valid')
+    if lang_base not in language_dict.values():
+        print(f"Sorry, the program doesn't support {lang_base}")
         exit()
 
+    if args.lang_translate == 'all':
+        lang_translate = 0
+    elif lang_translate not in language_dict.values():
+        print(f"Sorry, the program doesn't support {lang_translate}")
+        exit()
 
     return lang_base, lang_translate, args.word
 
@@ -73,7 +83,7 @@ def multi_translate(lang_base, word, language_dict, file):
             continue
 
         page_html = get_response(lang_base, language_dict[i], word)
-        translate(page_html, language_dict[i], file)
+        translate(page_html, language_dict[i], file, word)
 
 
 def main():
@@ -86,7 +96,7 @@ def main():
 
     if lang_translate != 0:
         page_html = get_response(lang_base, lang_translate, word)
-        translate(page_html, lang_translate, file)
+        translate(page_html, lang_translate, file, word)
     else:
         multi_translate(lang_base, word, language_dict, file)
 
