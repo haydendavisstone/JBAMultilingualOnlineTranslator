@@ -1,3 +1,4 @@
+import argparse
 import requests
 from bs4 import BeautifulSoup
 
@@ -42,21 +43,27 @@ def output_examples(soup, lang_translate, file):
 
 
 def get_langs(language_dict):
-    print("Hello, welcome to the translator. Translator supports:")
+    parser = argparse.ArgumentParser()
 
-    for i in language_dict:
-        print(f"{i}. {language_dict[i]}")
+    parser.add_argument('lang_base', type=str)
+    parser.add_argument('lang_translate', type=str)
+    parser.add_argument('word', type=str)
 
-    lang_base = language_dict[int(input("Type the number of your language:"))]
-    lang_translate = input("Type the number of a language you want to translate to or '0' to translate to all languages:")
-    if int(lang_translate) in language_dict:
-        lang_translate = language_dict[int(lang_translate)]
-    elif lang_translate == '0':
+    args = parser.parse_args()
+
+    lang_base = args.lang_base.capitalize()
+    lang_translate = args.lang_translate.capitalize()
+
+    if lang_translate in language_dict.values():
+        pass
+    elif args.lang_translate == 'all':
         lang_translate = 0
+    else:
+        print('language not valid')
+        exit()
 
-    word = input("Type the word you want to translate:")
 
-    return lang_base, lang_translate, word
+    return lang_base, lang_translate, args.word
 
 def multi_translate(lang_base, word, language_dict, file):
 
